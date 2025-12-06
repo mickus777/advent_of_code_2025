@@ -2,6 +2,7 @@
 #include <iostream>
 #include <list>
 #include <sstream>
+#include <vector>
 
 struct Range
 {
@@ -20,33 +21,52 @@ struct Range
 
 bool is_invalid(long long value)
 {
-    std::list<int> digits;
+    std::list<int> digit_list;
     while (value > 0)
     {
         int digit = value % 10;
         value /= 10;
-        digits.push_back(digit);
+        digit_list.push_back(digit);
     }
+    digit_list.reverse();
 
-    if (digits.size() % 2 > 0)
-        return false;
-
-    size_t midpoint = digits.size() / 2;
-
-    auto first = digits.begin();
-    auto second = digits.begin();
-    for (size_t i = 0; i < midpoint; ++i)
-        ++second;
-
-    while (second != digits.end())
+    std::vector<int> digits(digit_list.size());
+    size_t index = 0;
+    for (auto it = digit_list.begin(); it != digit_list.end(); ++it)
     {
-        if (*first != *second)
-            return false;
-        ++first;
-        ++second;
+        digits[index] = *it;
+        ++index;
     }
 
-    return true;
+    for (size_t len = 1; len <= digits.size() / 2; ++len)
+    {
+        if (digits.size() % len != 0)
+            continue;
+
+        bool same_segments = true;
+        for (size_t i = 0; i < len; ++i)
+        {
+            bool same_digit_at_interval = true;
+            int digit = digits[i];
+            for (size_t j = i + len; j < digits.size(); j += len)
+            {
+                if (digit != digits[j])
+                {
+                    same_digit_at_interval = false;
+                    break;
+                }
+            }
+            if (!same_digit_at_interval)
+            {
+                same_segments = false;
+                break;
+            }
+        }
+        if (same_segments)
+            return true;
+    }
+
+    return false;
 }
 
 int main()
