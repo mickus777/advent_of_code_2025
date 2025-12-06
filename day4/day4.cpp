@@ -64,6 +64,14 @@ void printFloorplan(std::vector<std::vector<FloorState>>& floorplan, size_t heig
     }
 }
 
+void clearAllFreeSpace(std::vector<std::vector<FloorState>>& floorplan, size_t height, size_t width)
+{
+    for (size_t x = 0; x < width; ++x)
+        for (size_t y = 0; y < height; ++y)
+            if (floorplan[x][y] == Free)
+                floorplan[x][y] = Empty;
+}
+
 int main()
 {
     std::fstream fs;
@@ -92,40 +100,50 @@ int main()
         ++y;
     }
 
-    printFloorplan(floorplan, height, width);
 
     int count = 0;
-    for (size_t x = 0; x < width; ++x)
+    int lastCount = 0;
+    do
     {
-        for (size_t y = 0; y < height; ++y)
-        {
-            if (Roll != floorplan[x][y])
-                continue;
+        std::cout << std::endl;
+        printFloorplan(floorplan, height, width);
 
-            int neighbors = 0;
-            if (!(Empty == stateAt(N, x, y, width, height, floorplan)))
-                ++neighbors;
-            if (!(Empty == stateAt(NE, x, y, width, height, floorplan)))
-                ++neighbors;
-            if (!(Empty == stateAt(E, x, y, width, height, floorplan)))
-                ++neighbors;
-            if (!(Empty == stateAt(SE, x, y, width, height, floorplan)))
-                ++neighbors;
-            if (!(Empty == stateAt(S, x, y, width, height, floorplan)))
-                ++neighbors;
-            if (!(Empty == stateAt(SW, x, y, width, height, floorplan)))
-                ++neighbors;
-            if (!(Empty == stateAt(W, x, y, width, height, floorplan)))
-                ++neighbors;
-            if (!(Empty == stateAt(NW, x, y, width, height, floorplan)))
-                ++neighbors;
-            if (neighbors < 4)
+        lastCount = count;
+        for (size_t x = 0; x < width; ++x)
+        {
+            for (size_t y = 0; y < height; ++y)
             {
-                floorplan[x][y] = Free;
-                ++count;
+                if (Roll != floorplan[x][y])
+                    continue;
+
+                int neighbors = 0;
+                if (!(Empty == stateAt(N, x, y, width, height, floorplan)))
+                    ++neighbors;
+                if (!(Empty == stateAt(NE, x, y, width, height, floorplan)))
+                    ++neighbors;
+                if (!(Empty == stateAt(E, x, y, width, height, floorplan)))
+                    ++neighbors;
+                if (!(Empty == stateAt(SE, x, y, width, height, floorplan)))
+                    ++neighbors;
+                if (!(Empty == stateAt(S, x, y, width, height, floorplan)))
+                    ++neighbors;
+                if (!(Empty == stateAt(SW, x, y, width, height, floorplan)))
+                    ++neighbors;
+                if (!(Empty == stateAt(W, x, y, width, height, floorplan)))
+                    ++neighbors;
+                if (!(Empty == stateAt(NW, x, y, width, height, floorplan)))
+                    ++neighbors;
+                if (neighbors < 4)
+                {
+                    floorplan[x][y] = Free;
+                    ++count;
+                }
             }
         }
+
+        clearAllFreeSpace(floorplan, height, width);
     }
+    while (count != lastCount);
 
     std::cout << std::endl;
     printFloorplan(floorplan, height, width);
